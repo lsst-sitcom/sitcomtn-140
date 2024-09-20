@@ -1,0 +1,23 @@
+[technote]
+id = "SITCOMTN-140"
+series_id = "SITCOMTN"
+canonical_url = "https://sitcomtn-140.lsst.io"
+github_url = "https://github.com/lsst-sitcom/sitcomtn-140"
+github_default_branch = "main"
+date_created = 2024-09-20T18:14:10Z
+organization.name = "Vera C. Rubin Observatory"
+organization.ror = "https://ror.org/048g3cy84"
+license.id = "CC-BY-4.0"
+
+[technote.status]
+state = "draft"
+
+[[technote.authors]]
+name.given = "Prakruth"
+name.family = "Adari"
+internal_id = "adarip"
+orcid = "https://orcid.org/0000-0001-9431-3806"
+[[technote.authors.affiliations]]
+name = "Department of Physics and Astronomy"
+internal_id = "StonyBrookU"
+address = "Stony Brook University, Stony Brook, NY 11794, USA"
