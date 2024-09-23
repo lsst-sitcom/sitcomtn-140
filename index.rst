@@ -4,7 +4,7 @@ Point vs Extended Object Classification with Blending in Operations Rehearsal 3
 
 .. abstract::
 
-   Blending occurs when the flux along a line of sight can be attributed to multiple source objects. This can lead to misclassification of objects which we investigate in the technote. Using observed images generated in Operations Rehearsal 3 matched against the input truth we can identify the true label for each object and compare against the observed label. Objects are classified as isolated or blended and either star (point source) or galaxy (extended source) with subcategories in blends. We focus on the purity, blend fraction, and misclassification rate of each class and operate at both the visit and co-add level.
+   Blending occurs when the flux along a line of sight can be attributed to multiple source objects. This can lead to misclassification of objects which we investigate in the technote. Using observed images generated in Operations Rehearsal 3 matched against the input truth we can identify the true label for each object and compare against the observed label. Objects are classified as isolated or blended and either star (point source) or galaxy (extended source) with subcategories in blends. We focus on the purity, blend fraction, and misclassification rate of each class and operate at both the visit and co-add level. This gives us a baseline that we can use for comparison during commissioning.
 
 
 
@@ -113,3 +113,9 @@ Following SITCOMTN-128, we can also investigate how local density would affect c
 .. figure:: ./_static/visit_density.png
 
    Star-galaxy classification metrics against observed object density. There is very little dependence on any metric to density.
+
+
+Seeing
+-----------
+
+Let's rebin with seeing parameters
