@@ -23,7 +23,6 @@ Data
 
         * Works with deblended children, removes sky objects, and is only inner regions
         * Might be a problem to apply cuts before matching but good for understandability
-        * Double check!
 
    * In the observed catalog we only have :code:`extendedness` which is 1 for extended objects. We assume all extended objects are galaxies and use the two interchangibly 
 
@@ -65,7 +64,7 @@ After applying these cuts we classify observed objects:
 
 .. figure:: ./_static/object_class_example.png
 
-   Example distribution of objects in a co-add
+   Example distribution of objects in a co-add. 
 
 
 Star Galaxy Classification
@@ -74,13 +73,13 @@ Once objects are classified we focus on three metrics: purity, blend rate, and n
 
 .. math::
 
-   \textrm{Purity} = \frac{\textrm{Number of isolated stars/galaxies}}{\textrm{Total number of observed stars/galaxies}}
+   \textrm{Purity} = \frac{\textrm{Number of isolated stars/galaxies per bin }}{\textrm{Total number of observed stars/galaxies per bin }}
 .. math::
 
-   \textrm{Blend Rate} = \frac{\textrm{Number of blended objects (G+G, S+S, G+S, Misc)}}{\textrm{Total number of observed stars/galaxies}} 
+   \textrm{Blend Rate} = \frac{\textrm{Number of blended objects (G+G, S+S, G+S, Misc) per bin }}{\textrm{Total number of observed stars/galaxies per bin }} 
 .. math::
 
-   \textrm{Non-blend Misclassification} = \frac{\textrm{Number of isolated galaxies/stars}}{\textrm{Number of observed stars/galaxies}}
+   \textrm{Non-blend Misclassification} = \frac{\textrm{Number of isolated galaxies/stars per bin }}{\textrm{Number of observed stars/galaxies per bin }}
 
 Note that 
 
@@ -91,31 +90,80 @@ Note that
 due to the last two categories, "No Match" and "No Match after Magnitude Cut."
 
 
+
 Magnitude
 -------------
-We bin objects based on their magnitude and present the three metrics for a single visit and a co-add.
+We bin objects based on their :math:`i`-magnitude and present the three metrics for visits versus and a co-add.
 
-
+.. _singlepurity:
 .. figure:: ./_static/visit_imag.png
 
-   Star-galaxy classification purity, blend fraction, and non-blend misclassification rates against observed i-magnitudes from a single visit
+   Star-galaxy classification purity, blend fraction, and non-blend misclassification rates against observed i-magnitudes from a single visit.
+
+.. _otherpurity:
+.. figure:: ./_static/visit_imag2.png
+
+   Another example of star-galaxy classification on a different visit. This is using smaller bins than the example above to highlight the plateau of stellar purity at 23 :math:`i`-mag.
 
 .. figure:: ./_static/coadd_mag.png
 
-   Star-galaxy classification purity, blend fraction, and non-blend miscassification against observed i-magnitudes on deep coadds. Note that we are looking at a similar region of sky as above and are much better at galaxy classification at the faint end when compared to the single visit.
+   Star-galaxy classification purity, blend fraction, and non-blend miscassification against observed i-magnitudes on deep coadds. We are much better at galaxy classification at the faint end when compared to the single visit.
+
+In single visits we see a drop in galaxy classification at around :math:`i \sim 24` and a similar drop at around :math:`i \sim 23` for stars.
+When coadding, the drop in stars is shifted to slighly deeper magnitudes while enabling detection of far fainter galaxies.
+Coadding helps tremendously with galaxy identification.
 
 
-Density
------------
+Seeing and Stellar Density
+------------------------------
+We expect our star-galaxy classification scheme to vary with stellar density.
+However, the seeing of a visit will also affect the number of objects detected as extendeded (galaxies).
 
-Following SITCOMTN-128, we can also investigate how local density would affect classification expecting noisy fields to do worse.
+As seen in :numref:`singlepurity` and :numref:`otherpurity` the stellar classification starts very close to one and then drops off at some magnitude whereas the galaxy classification has less uniform behavior.
+We can use the drop in stellar purity, specifically the magnitude at which we have 50% stellar purity, to characterize the pipeline classification 
 
-.. figure:: ./_static/visit_density.png
+As seen in those examples, there are times the stellar purity does not drop down to 0 in our magnitude range or has a very noisy tail. 
+To account for this we fit a Fermi-Dirac (FD) distribution to the stellar purity and then have an analytic expression for the 50% purity.
+The distribution takes the form 
 
-   Star-galaxy classification metrics against observed object density. There is very little dependence on any metric to density.
+.. math::
+
+    P(m) = \frac{1}{e^{\beta(m - m_0)} + 1} 
+
+where the fitted parameter :math:`m_0` is the 50% purity magnitude ( :math:`\beta` is a nuisance parameter). 
+
+An example is shown below in :numref:`exampleFD`. 
+
+.. _exampleFD:
+.. figure:: ./_static/FD_survivalfunction.png
+
+    An example fit to stellar purity.
+
+For each visit we then have the true stellar/galaxy/object density, observed stellar/galaxy/object density, and seeing.
+For :math:`i`-band visits we label objects, calculate the classification metrics (purity, blend fraction, and non-blend misclassification), fit a FD distribution, and extract a 50% purity.
+
+.. 
+    Below (:numref:`sp-seeing` and :numref:`sp-stellardensity`) we show the results using 100 visits. 
+
+In :numref:`sp-seeing` we see that with lower seeing we are able to see deeper (fainter 50%) but it is quite dependent on stellar density where, paradoxically, the higher the density, the less the seeing matters.
+In the next plot, :numref:`sp-stellardensity`,  we see that for a density there is anywhere from a .25 to 1 magnitude improvement with better seeing.
 
 
-Seeing
------------
+.. _sp-seeing:
+.. figure:: ./_static/stellar_purity_seeing2.png
 
-Let's rebin with seeing parameters
+    :math:`i`-magnitude of 50% stellar purity versus seeing for a visit. Color coded based on the true stellar density with red indicating high true stellar density and blue for low true stellar density. We see that for any seeing, there is better depth with higher stellar density.
+
+
+.. _sp-stellardensity:
+.. figure:: ./_static/stellar_purity_stellardensity2.png
+
+    :math:`i`-magnitude of 50% stellar purity versus true stellar density for a visit. Color coded based on the seeing with yellow indicating high seeing and blue for low seeing. At a fixed density, we see the expected behavior of better depth with lower seeing.
+
+Conclusion
+===========
+
+We have extended our algorithm to label unrecognized blends outlined in SITCOMTN-128 in order to study star-galaxy classification.
+Using metrics such as purity, non-blend misclassification, and blend rate we can quantify the pipeline's classification and how that varies with factors such as object magnitude, observed density, seeing, and stellar density.
+To compress this information and study the interplay between several factors, we extract the magnitude at which only 50% of observed stars are truly stars. 
+We find that we are able to go to fainter magnitudes with better seeing, as expected, but can get fainter magnitudes when we have a higher stellar density which is somewhat counter-intuitive.
